@@ -299,6 +299,10 @@ export class EnhancedGitHubSegmentMCP {
       `Using GitHub token: ${process.env.GITHUB_TOKEN?.substring(0, 4)}...`
     );
   }
+
+  public getServer(): Server {
+    return this.server;
+  }
 }
 
 // Handle process termination gracefully

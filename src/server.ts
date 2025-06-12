@@ -1,8 +1,13 @@
 import "dotenv/config";
 import express, { Request, Response, NextFunction } from "express";
+import { EnhancedGitHubSegmentMCP } from "./index";
 
 const app = express();
 const port = process.env.PORT || 3000;
+
+// Instantiate MCP server (same tool definitions) once for all requests
+const mcp = new EnhancedGitHubSegmentMCP();
+const mcpServer = mcp.getServer();
 
 // Middleware
 app.use(express.json());
@@ -97,6 +102,18 @@ app.post("/tools", (req: Request, res: Response) => {
       "search_org_event",
     ],
   });
+});
+
+// JSON-RPC endpoint for MCP
+app.post("/service/request", async (req: Request, res: Response) => {
+  try {
+    // @ts-ignore - handleRequest is available at runtime but not in type defs
+    const result = await (mcpServer as any).handleRequest(req.body);
+    res.json(result);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    res.status(500).json({ error: message });
+  }
 });
 
 // Start server
