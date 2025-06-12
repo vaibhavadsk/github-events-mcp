@@ -1,6 +1,16 @@
 import "dotenv/config";
 import express, { Request, Response, NextFunction } from "express";
 import { EnhancedGitHubSegmentMCP } from "./index";
+import { Octokit } from "@octokit/rest";
+import { scanRepoEventsHandler } from "./handlers/scanRepoEvents.js";
+import {
+  extractEventsFromFileHandler,
+  analyzePREventsHandler,
+  suggestEventImprovementsHandler,
+  createEventDocumentationHandler,
+  validateEventSchemaHandler,
+} from "./handlers/index.js";
+import { searchOrgEvent } from "./handlers/repoWithEventHandler.js";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -8,6 +18,10 @@ const port = process.env.PORT || 3000;
 // Instantiate MCP server (same tool definitions) once for all requests
 const mcp = new EnhancedGitHubSegmentMCP();
 const mcpServer = mcp.getServer();
+
+// Octokit instance for HTTP tools
+const token = process.env.GITHUB_TOKEN;
+const httpOctokit = new Octokit({ auth: token });
 
 // Middleware
 app.use(express.json());
@@ -107,8 +121,35 @@ app.post("/tools", (req: Request, res: Response) => {
 // JSON-RPC endpoint for MCP
 app.post("/service/request", async (req: Request, res: Response) => {
   try {
-    // @ts-ignore - handleRequest is available at runtime but not in type defs
-    const result = await (mcpServer as any).handleRequest(req.body);
+    const { method: name, params: args } = req.body;
+
+    let result;
+    switch (name) {
+      case "scan_repo_events":
+        result = await scanRepoEventsHandler(httpOctokit, args);
+        break;
+      case "search_org_event":
+        result = await searchOrgEvent(httpOctokit, args);
+        break;
+      case "extract_events_from_file":
+        result = await extractEventsFromFileHandler(httpOctokit, args);
+        break;
+      case "analyze_pr_events":
+        result = await analyzePREventsHandler(httpOctokit, args);
+        break;
+      case "suggest_event_improvements":
+        result = await suggestEventImprovementsHandler(args);
+        break;
+      case "create_event_documentation":
+        result = await createEventDocumentationHandler(args);
+        break;
+      case "validate_event_schema":
+        result = await validateEventSchemaHandler(args);
+        break;
+      default:
+        return res.status(400).json({ error: `Unknown tool: ${name}` });
+    }
+
     res.json(result);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
