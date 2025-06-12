@@ -48,6 +48,42 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 // MCP tools endpoint
+app.get("/tools", (req: Request, res: Response) => {
+  res.json({
+    tools: [
+      {
+        name: "scan_repo_events",
+        description: "Scans a repository for event usage.",
+      },
+      {
+        name: "extract_events_from_file",
+        description: "Extracts analytics events from a file.",
+      },
+      {
+        name: "analyze_pr_events",
+        description: "Analyzes pull requests for event changes.",
+      },
+      {
+        name: "suggest_event_improvements",
+        description: "Suggests improvements for detected events.",
+      },
+      {
+        name: "create_event_documentation",
+        description: "Generates documentation for analytics events.",
+      },
+      {
+        name: "validate_event_schema",
+        description: "Validates events against the analytics schema.",
+      },
+      {
+        name: "search_org_event",
+        description: "Searches an organization for specific events.",
+      },
+    ],
+  });
+});
+
+// MCP tools endpoint
 app.post("/tools", (req: Request, res: Response) => {
   res.json({
     message: "MCP tools endpoint",
