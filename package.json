@@ -1,0 +1,52 @@
+{
+  "name": "enhanced-segment-analytics-mcp",
+  "version": "2.0.0",
+  "description": "Enhanced MCP for segment analytics tracking with flow analysis",
+  "type": "commonjs",
+  "main": "dist/src/index.js",
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "start": "node dist/src/index.js",
+    "start:server": "node dist/src/server.js",
+    "start:prod": "npm run build && node dist/src/index.js",
+    "dev": "ts-node src/index.ts",
+    "dev:server": "ts-node src/server.ts",
+    "dev:watch": "nodemon --watch src --ext ts --exec ts-node src/server.ts",
+    "test": "node --test",
+    "clean": "rm -rf dist",
+    "fix-imports": "./fix-imports.sh",
+    "docker:build": "docker build -t mcp-server .",
+    "docker:run": "docker run -p 3000:3000 --env-file .env mcp-server",
+    "docker:compose": "docker-compose up",
+    "deploy:ecs": "./deploy-ecs.sh",
+    "deploy:ec2": "./deploy-simple.sh"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "@octokit/rest": "^20.0.0",
+    "dotenv": "^16.3.0",
+    "express": "^4.18.2",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.134",
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.0.0",
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.0.2",
+    "serverless": "^3.38.0",
+    "serverless-offline": "^13.3.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.0.0"
+  },
+  "keywords": [
+    "mcp",
+    "segment",
+    "analytics",
+    "tracking",
+    "github"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}
